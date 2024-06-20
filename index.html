@@ -1,1 +1,103 @@
-난 <strong>시영</strong> 의 홈페이지
+안녕 나는 <strong>시영</strong>의 사이트야
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>장애물 피하기 게임</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        
+        #game {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            border: 1px solid #ccc;
+        }
+        
+        #player {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 20px;
+            background-color: blue;
+        }
+        
+        .obstacle {
+            position: absolute;
+            top: 0;
+            width: 30px;
+            height: 30px;
+            background-color: red;
+        }
+    </style>
+</head>
+<body>
+    <div id="game">
+        <div id="player"></div>
+    </div>
+    
+    <script>
+        const player = document.getElementById('player');
+        const game = document.getElementById('game');
+        
+        let gameInProgress = true;
+        
+        function movePlayer(event) {
+            if (gameInProgress) {
+                const x = event.clientX - game.offsetLeft;
+                player.style.left = `${x}px`;
+            }
+        }
+        
+        function createObstacle() {
+            if (gameInProgress) {
+                const obstacle = document.createElement('div');
+                obstacle.classList.add('obstacle');
+                obstacle.style.left = `${Math.random() * 370}px`;
+                game.appendChild(obstacle);
+        
+                const obstacleInterval = setInterval(() => {
+                    const currentTop = parseInt(obstacle.style.top, 10);
+                    obstacle.style.top = `${currentTop + 1}px`;
+        
+                    if (checkCollision(obstacle)) {
+                        clearInterval(obstacleInterval);
+                        gameInProgress = false;
+                        alert('게임 오버!');
+                    }
+        
+                    if (parseInt(obstacle.style.top, 10) > 400) {
+                        clearInterval(obstacleInterval);
+                        game.removeChild(obstacle);
+                    }
+                }, 10);
+            }
+        }
+        
+        function checkCollision(obstacle) {
+            const playerRect = player.getBoundingClientRect();
+            const obstacleRect = obstacle.getBoundingClientRect();
+        
+            return !(playerRect.right < obstacleRect.left || 
+                     playerRect.left > obstacleRect.right || 
+                     playerRect.bottom < obstacleRect.top || 
+                     playerRect.top > obstacleRect.bottom);
+        }
+        
+        document.addEventListener('mousemove', movePlayer);
+        
+        setInterval(createObstacle, 2000);
+    </script>
+</body>
+</html>
